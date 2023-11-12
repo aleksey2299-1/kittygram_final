@@ -133,7 +133,7 @@ jobs:
         # Одновременный билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
-          context: ./gateway/
+          context: ./nginx/
           push: true
           tags: aleksey2299/kittygram_gateway:latest
 
