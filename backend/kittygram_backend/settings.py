@@ -4,7 +4,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', '83(vot%*rpken0wm#0lt!defrrf0%%=hl$ey8(b20%l8a07#f^') # default key is just for django test
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
