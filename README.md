@@ -1,26 +1,79 @@
-#  Как работать с репозиторием финального задания
+## Проект Kittygram
 
-## Что нужно сделать
+Посмотреть на котиков и/или похвастаться своим(своими).
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+Чтобы похвастаться необходимо зарегистрироваться
 
-## Как проверить работу с помощью автотестов
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
-```
+### Как запустить проект:
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+Клонировать репозиторий и перейти в него в командной строке:
+````
+git clone git@github.com:aleksey2299-1/kittygram_final.git
+cd kittygram_final
+````
+В директории проекта создайте файл .env c данными:
+````
+POSTGRES_DB=<название db>
+POSTGRES_USER=<имя пользователя для db>
+POSTGRES_PASSWORD=<пароль пользователя для db>
+DB_HOST=db # если поменять, то тогда нужно поменять название сервиса в docker-compose.production.yml
+DB_PORT=5432 # это порт по умолчанию для db
+SECRET_KEY=<SECRET_KEY в настройках django>
+DEBUG=<True или False>
+ALLOWED_HOSTS=<ваши адреса через пробел(пример:localhost 127.0.0.1 xxxx.com)>
+````
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
 
-## Чек-лист для проверки перед отправкой задания
+Запустить Docker(чтобы запустить в режиме демона добавьте флаг -d):
+````
+sudo docker compose -f docker-compose.production.yml up
+````
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+
+Если Docker не установлен, в терминале linux это можно сделать так:
+````
+sudo apt update
+sudo apt install curl
+curl -fSL https://get.docker.com -o get-docker.sh
+sudo sh ./get-docker.sh
+sudo apt install docker-compose-plugin 
+````
+
+### Как начать?
+
+Перейте по адресу localhost:9000/
+
+### Доступ по Api
+
+__Чтобы увидеть информацию нужно зарегистрироваться:__
+
+в теле запроса передать username и password:
+````
+localhost:8000/api/users/
+````
+получить token:
+````
+localhost:8000/api/token/login/
+````
+
+
+Посмотреть всеx котиков:
+````
+localhost:8000/api/cats/
+````
+
+Посмотреть конкретного котика:
+````
+localhost:8000/api/cats/<номер_котика>/
+````
+
+Посмотреть все достижения:
+````
+localhost:8000/api/achievements/
+````
+
+Посмотреть конкретное достижение:
+````
+localhost:8000/api/achievements/<номер_достижения>/
+````
