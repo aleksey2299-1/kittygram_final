@@ -6,15 +6,37 @@ on:
       - main
 
 jobs:
-  tests:
+  linter_test:
+    name: Test backend with linter
+    runs-on: ubuntu-latest
+    steps:
+      # Копирование репозитория из GitHub
+      - uses: actions/checkout@v3
+      - name: Set up Python
+      # Установка python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip 
+          pip install -r ./backend/requirements.lint.txt
+      - name: Test with flake8
+        run: |
+          cd backend/
+          python -m flake8 .
+  django_test:
     runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:13.10
+        # Зачем это пихать в секрет? это же только для теста
         env:
-          POSTGRES_USER: django_user
-          POSTGRES_PASSWORD: django_password
-          POSTGRES_DB: django_db
+          POSTGRES_USER: django_user #          ^
+          POSTGRES_PASSWORD: django_password #  ^
+          POSTGRES_DB: django_db #              ^
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -26,13 +48,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip 
-        pip install flake8==6.0.0 flake8-isort==6.0.0
         pip install -r ./backend/requirements.txt 
-    - name: Test with flake8 and django tests
+    - name: Test with django tests
       env:
         POSTGRES_USER: django_user
         POSTGRES_PASSWORD: django_password
@@ -40,13 +62,14 @@ jobs:
         DB_HOST: 127.0.0.1
         DB_PORT: 5432
       run: |
-        python -m flake8 backend/
         cd backend/
         python manage.py test
   build_and_push_to_docker_hub:
     name: Push Docker image to DockerHub
     runs-on: ubuntu-latest
-    needs: tests
+    needs:
+      - linter_test
+      - django_test
     steps:
       - name: Check out the repo
         # Получение исходного кода из репозитория
@@ -133,7 +156,7 @@ jobs:
         # Одновременный билд и пуш образа в Docker Hub
         uses: docker/build-push-action@v4
         with:
-          context: ./gateway/
+          context: ./nginx/
           push: true
           tags: aleksey2299/kittygram_gateway:latest
 
